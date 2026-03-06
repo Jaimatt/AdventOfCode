@@ -1,0 +1,45 @@
+import time,sys
+start = time.time()
+sys.setrecursionlimit(30000)
+i = open('10_test.txt').read()
+
+pipes = [[x for x in y] for y in i.split('\n')]
+
+icons = [['|',[1,0],[-1,0]],['-',[0,1],[0,-1]],['L',[-1,0],[0,1]],['J',[-1,0],[0,-1]],['7',[1,0],[0,-1]],['F',[1,0],[0,1]]]
+
+def p():
+    for row in pipes:
+        for c in row:
+            print(c,end=" ")
+        print()
+    print()
+
+def findStart():
+    for r,row in enumerate(pipes):
+        for c,col in enumerate(row):
+            if col != "S": continue
+            if pipes[r+1][c] in ['|','J','L']: return r+1,c
+            if pipes[r-1][c] in ['|','F','7']: return r+1,c
+            if pipes[r][c+1] in ['-','7','J']: return r+1,c
+
+def traverse(row,col):
+    me = pipes[row][col]
+    if me in ['S','O','.']:
+        return 0
+
+    pipes[row][col] = 'O'
+
+    routes = []
+    for p in icons:
+        if me == p[0]:
+            routes.append(traverse(row+p[1][0],col+p[1][1]))
+            routes.append(traverse(row+p[2][0],col+p[2][1]))
+            return max(routes)+1
+    return False
+
+sr,sc = findStart()
+steps = traverse(sr,sc)+1
+print(int(steps/2))
+p()
+
+print("--- %s ms ---" % ((time.time() - start)*1000))
